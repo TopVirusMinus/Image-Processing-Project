@@ -1,0 +1,92 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body,
+html {
+  background: #eee;
+}
+
+/* Styles for the upload form */
+.upload-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10vh; /* Adjust the margin top to move the content up or down */
+}
+
+.upload-form h2 {
+  margin-bottom: 1rem;
+}
+
+.upload-form form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+/* Styles for the image and filters */
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+img {
+  margin-top: 1em;
+  max-width: 60%;
+  max-height: 40vh;
+}
+
+.filter-select {
+  margin-top: 2em;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  margin-bottom: 1em;
+  width: 15em;
+}
+
+.dropbtn {
+  background-color: #007bff;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+
+.dropbtn:hover {
+  background-color: #3e8e41;
+}
+
+.filter-select option {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+  background-color: #f1f1f1;
+}
+
+.filter-select:hover {
+  background-color: #3e8e41;
+}
+
+.images {
+  display: flex;
+  justify-content: space-evenly;
+  width: fit-content;
+  gap: 1em;
+  align-items: center;
+}
+
+span {
+  font-weight: bold;
+  font-size: 2em;
+}

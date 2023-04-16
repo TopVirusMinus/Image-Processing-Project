@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <link rel="stylesheet" href="styles.css" />
+    <title>Image Filters Project</title>
+  </head>
+  <body>
+    <div class="upload-form">
+      <h2>Upload an Image</h2>
+      <form>
+        <input type="file" name="image-upload" accept="image/*" />
+      </form>
+      <div class="images">
+        <img class="image original-image" alt="Uploaded image" hidden />
+        <span class="arrow" hidden>&#8594;</span>
+        <img class="image filtered-image" alt="Uploaded image" hidden />
+      </div>
+      <select class="filter-select">
+        <option value="filter1">Filter 1</option>
+        <option value="filter2">Filter 2</option>
+        <option value="filter3">Filter 3</option>
+      </select>
+      <button class="dropbtn">Apply Filter</button>
+    </div>
+    <script>
+      const uploadInput = document.querySelector('input[name="image-upload"]');
+      const uploadedImage = document.querySelector(".original-image");
+      const filteredImage = document.querySelector(".filtered-image");
+      const arrow = document.querySelector(".arrow");
+
+      uploadInput.addEventListener("change", function () {
+        const file = this.files[0];
+        const reader = new FileReader();
+        reader.addEventListener("load", function () {
+          uploadedImage.src = reader.result;
+          uploadedImage.removeAttribute("hidden");
+
+          filteredImage.src = reader.result;
+          filteredImage.removeAttribute("hidden");
+
+          arrow.removeAttribute("hidden");
+        });
+        reader.readAsDataURL(file);
+      });
+    </script>
+  </body>
+</html>
