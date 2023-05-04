@@ -46,6 +46,21 @@
         });
         reader.readAsDataURL(file);
       });
+
+        applyFilterButton.addEventListener("click", async function () {
+          const filterType = filterSelect.value;
+          const response = await fetch('/process-image', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `image_data=${encodeURIComponent(uploadedImage.src)}&filter_type=${filterType}`,
+          });
+
+          const result = await response.json();
+          filteredImage.src = result.processed_image;
+          filteredImage.removeAttribute("hidden");
+        });
     </script>
   </body>
 </html>
