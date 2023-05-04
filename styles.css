@@ -41,6 +41,7 @@ img {
   margin-top: 1em;
   max-width: 60%;
   max-height: 40vh;
+  
 }
 
 .filter-select {
@@ -63,7 +64,7 @@ img {
 }
 
 .dropbtn:hover {
-  background-color: #3e8e41;
+  background-color: #65adf9;
 }
 
 .filter-select option {
@@ -75,13 +76,13 @@ img {
 }
 
 .filter-select:hover {
-  background-color: #3e8e41;
+  background-color: #65adf9;
 }
 
 .images {
   display: flex;
   justify-content: space-evenly;
-  width: fit-content;
+  width: 500px;
   gap: 1em;
   align-items: center;
 }
