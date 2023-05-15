@@ -45,7 +45,7 @@ if (
   }
   else{
       min = 1;
-      max = 5;
+      max = 100;
       value = 1;
   }
   // Create a container for the slider and labels
