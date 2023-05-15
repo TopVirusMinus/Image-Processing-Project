@@ -2,6 +2,7 @@ import base64
 import cv2
 import math
 import numpy as np
+import random
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -145,6 +146,7 @@ def MinimumFilter(Kernel_size, image):
 
     Image_After = unpad_image(Image_After, start_row, end_row, start_col, end_col)
     return Image_After
+
 
 def RobertCrossGradient(image, kernel_type):
     padded_image, start_row, end_row, start_col, end_col = pad_image(image,(2,2))
@@ -303,7 +305,7 @@ def LaplaceOperator(Kernel_size, image, kernel_type=0):
                 i += 1
                 rstart += 1
             Laplace_image1[r][c] = Result
-            
+
     Laplace_image1 = unpad_image(Laplace_image1,start_row3,end_row3,start_col3,end_col3)
     return Laplace_image1
 
@@ -343,6 +345,38 @@ def SobelOperator(Kernel_size, image, kernel_type=0):
     return Sobel_image1
 
 
+def apply_impulse_noise(image):
+    new_image = image.copy()
+    for r in range(len(image)):
+        for c in range(len(image[r])):
+            new_image[r][c] = np.random.choice([0, 255, image[r][c]], p=(0.05, 0.05,0.90))
+    return new_image
+
+def apply_gaussian_noise(image, mean, stdev):
+    gaussian_noise_image = image.copy()
+
+    gaussian_noise_image = gaussian_noise_image.astype(float)
+
+    for i in range(gaussian_noise_image.shape[0]):
+        for j in range(gaussian_noise_image.shape[1]):
+            u1 = np.random.rand()
+            u2 = np.random.rand()
+
+            # Box-Muller transform
+            z1 = np.sqrt(-2 * np.log(u1)) * np.cos(2 * np.pi * u2)
+            z2 = np.sqrt(-2 * np.log(u1)) * np.sin(2 * np.pi * u2)
+
+            z1 = z1 * stdev + mean
+            z2 = z2 * stdev + mean
+
+            gaussian_noise_image[i, j] += z1
+            if i+1 < gaussian_noise_image.shape[0]:
+                gaussian_noise_image[i+1, j] += z2
+
+    # Clip the values to be in the valid range 0-255
+    gaussian_noise_image = np.clip(gaussian_noise_image, 0, 255)
+
+    return gaussian_noise_image
 @app.route('/process-image', methods=['POST'])
 def process_image():
     image_data = request.form.get('image_data')
@@ -385,6 +419,10 @@ def process_image():
         kernel_type = int(extra_parameters[0])
         print(kernel_type, kernel_size)
         processed_image = SobelOperator(kernel_size, gray_image, kernel_type)
+    elif filter_type == 'apply_impulse_noise':
+        processed_image = apply_impulse_noise(gray_image)
+    elif filter_type == 'apply_gaussian_noise':
+        processed_image = apply_gaussian_noise(gray_image, 5, 2)
 
     retval1, buffer1 = cv2.imencode('.jpg', processed_image)
     retval2, buffer2 = cv2.imencode('.jpg', gray_image)

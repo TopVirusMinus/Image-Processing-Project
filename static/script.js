@@ -345,6 +345,7 @@ applyFilterButton.addEventListener("click", async function () {
 
   const result = await response.json();
   filteredImage.src = result.processed_image;
+  uploadedImage.src = result.original_greyed;
 });
 
 kernelSizeSlider.addEventListener("input", function () {
