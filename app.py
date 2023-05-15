@@ -391,40 +391,25 @@ def process_image():
     nparr = np.frombuffer(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    filter_functions = {
+        'MedianFilter': lambda: MedianFilter(kernel_size, gray_image),
+        'AveragingFilter': lambda: AveragingFilter(kernel_size, gray_image),
+        'MaxFilter': lambda: MaxFilter(kernel_size, gray_image),
+        'MinimumFilter': lambda: MinimumFilter(kernel_size, gray_image),
+        'RobertCrossGradient': lambda: RobertCrossGradient(gray_image, float(extra_parameters[0])),
+        'UnsharpAvgFilter': lambda: UnsharpAvgFilter(kernel_size, gray_image, float(extra_parameters[0])),
+        'HighboostFilter': lambda: HighboostFilter(kernel_size, gray_image, float(extra_parameters[0])),
+        'LaplaceOperator': lambda: LaplaceOperator(kernel_size, gray_image, int(extra_parameters[0])),
+        'SobelOperator': lambda: SobelOperator(kernel_size, gray_image, int(extra_parameters[0])),
+        'apply_impulse_noise': lambda: apply_impulse_noise(gray_image),
+        'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+    }
     
-    if filter_type == 'MedianFilter':
-        processed_image = MedianFilter(kernel_size, gray_image)
-    elif filter_type == 'AveragingFilter':
-        processed_image = AveragingFilter(kernel_size, gray_image)
-    elif filter_type == 'MaxFilter':
-        processed_image = MaxFilter(kernel_size, gray_image)
-    elif filter_type == 'MinimumFilter':
-        processed_image = MinimumFilter(kernel_size, gray_image)
-    elif filter_type == 'RobertCrossGradient':
-        kernel_type = float(extra_parameters[0])
-        processed_image = RobertCrossGradient(gray_image, kernel_type)
-    elif filter_type == 'UnsharpAvgFilter':
-        K_value = float(extra_parameters[0])
-        print('K_value',K_value)
-        processed_image = UnsharpAvgFilter(kernel_size, gray_image, K_value)
-    elif filter_type == 'HighboostFilter':
-        K_value = float(extra_parameters[0])
-        print('K_value',K_value)
-        processed_image = HighboostFilter(kernel_size, gray_image, K_value)
-    elif filter_type == 'LaplaceOperator':
-        kernel_type = int(extra_parameters[0])
-        print(kernel_type, kernel_size)
-        processed_image = LaplaceOperator(kernel_size, gray_image, kernel_type)
-    elif filter_type == 'SobelOperator':
-        kernel_type = int(extra_parameters[0])
-        print(kernel_type, kernel_size)
-        processed_image = SobelOperator(kernel_size, gray_image, kernel_type)
-    elif filter_type == 'apply_impulse_noise':
-        processed_image = apply_impulse_noise(gray_image)
-    elif filter_type == 'apply_gaussian_noise':
-        mean = int(extra_parameters[0])
-        stdev = int(extra_parameters[1])
-        processed_image = apply_gaussian_noise(gray_image, mean, stdev)
+    processed_image = []
+    if filter_type in filter_functions:
+        processed_image = filter_functions[filter_type]()
+    else:
+        raise ValueError(f"Unknown filter type: {filter_type}")
 
     retval1, buffer1 = cv2.imencode('.jpg', processed_image)
     retval2, buffer2 = cv2.imencode('.jpg', gray_image)
