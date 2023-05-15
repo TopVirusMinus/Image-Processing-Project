@@ -255,6 +255,11 @@ applyFilterButton.addEventListener("click", async function () {
   kernelSizeValue.textContent = kernelSize;
   console.log(filterType);
 
+  let reuseFilteredImageCheckbox = document.querySelector(
+    "#reuse-filtered-image"
+  );
+  let reuseFilteredImage = reuseFilteredImageCheckbox.checked;
+
   const extraValuesArray = [];
 
   const extraValuesSpans = document.querySelectorAll(".extra-parameters span");
@@ -273,8 +278,12 @@ applyFilterButton.addEventListener("click", async function () {
 
   console.log(extraValuesArray);
 
+  let inputImageData = reuseFilteredImage
+    ? filteredImage.src
+    : uploadedImage.src;
+
   const body = `image_data=${encodeURIComponent(
-    uploadedImage.src
+    inputImageData
   )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraParams=${extraValuesArray.join(
     ","
   )}`;

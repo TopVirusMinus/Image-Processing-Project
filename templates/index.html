@@ -36,6 +36,7 @@
         <optgroup label="Mustafa">
           <option value="apply_impulse_noise">Impulse Noise (salt and pepper)</option>
           <option value="apply_gaussian_noise">Gaussian Noise</option>
+          <option value="apply_uniform_noise">Uniform Noise</option>
         </optgroup>
       </select>
       
@@ -47,6 +48,13 @@
         <label class="kernel_size_label" for="kernel-size">Kernel Size:</label>
         <input type="range" id="kernel-size" min="1" max="50" value="3" step="2" />
         <span id="kernel-size-value">3</span>
+        <form>
+              <div class="c" style="display: flex;">
+                <input type="checkbox" id="reuse-filtered-image" name="reuse-filtered-image" style="margin-right: 10px;">
+                <label for="reuse-filtered-image">Reuse Image</label><br>
+              </div>
+          </form>
+
         <button class="dropbtn">Apply Filter</button>
       </div>
     </div>
