@@ -422,7 +422,9 @@ def process_image():
     elif filter_type == 'apply_impulse_noise':
         processed_image = apply_impulse_noise(gray_image)
     elif filter_type == 'apply_gaussian_noise':
-        processed_image = apply_gaussian_noise(gray_image, 5, 2)
+        mean = int(extra_parameters[0])
+        stdev = int(extra_parameters[1])
+        processed_image = apply_gaussian_noise(gray_image, mean, stdev)
 
     retval1, buffer1 = cv2.imencode('.jpg', processed_image)
     retval2, buffer2 = cv2.imencode('.jpg', gray_image)
