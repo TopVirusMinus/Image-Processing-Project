@@ -63,34 +63,88 @@ def MedianFilter(Kernel_size, image):
     Image_After=unpad_image(Image_After, start_row, end_row, start_col, end_col)            
     return Image_After
 
-def AveragingFilter(img):
+def AveragingFilter(Kernel_size, image):
     kernel=0
-    k=13    
+    k=[Kernel_size,Kernel_size]
     r2=0
     c2=0
+    img,start_row, end_row, start_col, end_col= pad_image(image,k)
     Image_After=np.zeros((img.shape[0],img.shape[1]))
 
-    while r2 <= img.shape[0]-k:
-
+    while r2 <= img.shape[0]-k[0]:
         kernel=0
-        
-        for r in range(r2,r2+k):
-            for c in range(c2,c2+k):
+        for r in range(r2,r2+k[0]):
+            for c in range(c2,c2+k[1]):
                 kernel+=img[r,c]
-        
-        Image_After[r2+1,c2+1] = kernel/(k*k)
+    
+        Image_After[r2+math.floor(k[0]/2),c2+math.floor(k[1]/2)] = kernel/(k[0]**2) 
 
-        if c2 == img.shape[1]-k:
+        if c2 == img.shape[1]-k[1]:
             c2=0
             r2=r2+1
         else:
             c2=c2+1
-            
+
+    Image_After=unpad_image(Image_After, start_row, end_row, start_col, end_col)
     return Image_After
 
-def filter3(image):
-    # Apply filter 3 processing here
-    return image
+def MaxFilter(Kernel_size, image):
+    kernel=[]
+    k=[Kernel_size,Kernel_size]
+    r2=0
+    c2=0
+    img,start_row, end_row, start_col, end_col= pad_image(image,k)
+    Image_After=np.empty((img.shape[0],img.shape[1]))
+
+    while r2 <= img.shape[0]-k[0]:
+        kernel.clear()
+        for r in range(r2,r2+k[0]):
+            for c in range(c2,c2+k[1]):
+                kernel.append(img[r,c])
+                if np.isnan(Image_After[r,c]):
+                    Image_After[r,c] = img[r,c]
+
+        kernel.sort()
+        Image_After[r2+math.floor(k[0]/2),c2+math.floor(k[1]/2)] = kernel[len(kernel)-1]
+
+        if c2 == img.shape[1]-k[1]:
+            c2=0
+            r2+=1
+        else:
+            c2+=1
+
+
+    Image_After=unpad_image(Image_After, start_row, end_row, start_col, end_col)
+    return Image_After
+    
+def MinimumFilter(Kernel_size, image):
+    kernel = []
+    k = [Kernel_size, Kernel_size]
+    r2 = 0
+    c2 = 0
+    img, start_row, end_row, start_col, end_col = pad_image(image, k)
+    Image_After = np.empty(img.shape)
+
+    while r2 <= img.shape[0] - k[0]:
+        kernel.clear()
+        for r in range(r2, r2 + k[0]):
+            for c in range(c2, c2 + k[1]):
+                kernel.append(img[r, c])
+                if np.isnan(Image_After[r, c]):
+                    Image_After[r, c] = img[r, c]
+
+        kernel.sort()
+        Image_After[r2 + k[0] // 2, c2 + k[1] // 2] = kernel[0]
+
+        if c2 == img.shape[1] - k[1]:
+            c2 = 0
+            r2 += 1
+        else:
+            c2 += 1
+
+    Image_After = unpad_image(Image_After, start_row, end_row, start_col, end_col)
+    return Image_After
+
 
 @app.route('/process-image', methods=['POST'])
 def process_image():
@@ -108,9 +162,11 @@ def process_image():
     if filter_type == 'MedianFilter':
         processed_image = MedianFilter(kernel_size, gray_image)
     elif filter_type == 'AveragingFilter':
-        processed_image = AveragingFilter(gray_image)
-    elif filter_type == 'filter3':
-        processed_image = filter3(gray_image)
+        processed_image = AveragingFilter(kernel_size, gray_image)
+    elif filter_type == 'MaxFilter':
+        processed_image = MaxFilter(kernel_size, gray_image)
+    elif filter_type == 'MinimumFilter':
+        processed_image = MinimumFilter(kernel_size, gray_image)
 
     retval1, buffer1 = cv2.imencode('.jpg', processed_image)
     retval2, buffer2 = cv2.imencode('.jpg', gray_image)
