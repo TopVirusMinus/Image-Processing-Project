@@ -146,12 +146,16 @@ def MinimumFilter(Kernel_size, image):
     Image_After = unpad_image(Image_After, start_row, end_row, start_col, end_col)
     return Image_After
 
-def RobertCrossGradient(image):
+def RobertCrossGradient(image, kernel_type):
     padded_image, start_row, end_row, start_col, end_col = pad_image(image,(2,2))
     Output_image = padded_image.copy()
-    Robert_kernel1 =[[-1,0],
-            [0,1]]
-
+    Robert_kernel1 = []
+    
+    if kernel_type == 0:
+        Robert_kernel1 =[[0,-1],[1,0]]
+    elif kernel_type == 1:
+        Robert_kernel1 =[[-1,0],[0,1]]
+        
     Result = 0
     for r in range(start_row,end_row):
         for c in range(start_col,end_col):
@@ -249,10 +253,9 @@ def process_image():
         processed_image = MaxFilter(kernel_size, gray_image)
     elif filter_type == 'MinimumFilter':
         processed_image = MinimumFilter(kernel_size, gray_image)
-        processed_image = MaxFilter(kernel_size, gray_image)
     elif filter_type == 'RobertCrossGradient':
-        processed_image = RobertCrossGradient(gray_image)
-        processed_image = MaxFilter(kernel_size, gray_image)
+        kernel_type = float(extra_parameters[0])
+        processed_image = RobertCrossGradient(gray_image, kernel_type)
     elif filter_type == 'UnsharpAvgFilter':
         K_value = float(extra_parameters[0])
         print('K_value',K_value)
