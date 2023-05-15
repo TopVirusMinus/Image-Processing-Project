@@ -6,7 +6,7 @@ const applyFilterButton = document.querySelector(".dropbtn");
 const filterSelect = document.querySelector(".filter-select");
 const kernelSizeSlider = document.querySelector("#kernel-size");
 const kernelSizeValue = document.querySelector("#kernel-size-value");
-kernelSizeValue.style.textAlign = 'left';
+kernelSizeValue.style.textAlign = "left";
 uploadInput.addEventListener("change", function () {
   const file = this.files[0];
   const reader = new FileReader();
@@ -22,135 +22,288 @@ uploadInput.addEventListener("change", function () {
   reader.readAsDataURL(file);
 });
 
-
 document
   .querySelector(".filter-select")
   .addEventListener("change", function () {
     let extraParametersDiv = document.querySelector(".extra-parameters");
-// Clear existing content in extraParametersDiv
-extraParametersDiv.innerHTML = "";
+    // Clear existing content in extraParametersDiv
+    extraParametersDiv.innerHTML = "";
 
-if (
-  filterSelect.value === "UnsharpAvgFilter" ||
-  filterSelect.value === "HighboostFilter"
-) {
+    if (
+      filterSelect.value === "UnsharpAvgFilter" ||
+      filterSelect.value === "HighboostFilter"
+    ) {
+      let min = 0;
+      let max = 1;
+      let value = 0;
+      if (filterSelect.value === "UnsharpAvgFilter") {
+        min = 0;
+        max = 1;
+        value = 0;
+      } else {
+        min = 1;
+        max = 100;
+        value = 1;
+      }
+      // Create a container for the slider and labels
+      let container = document.createElement("div");
+      container.style.display = "flex";
+      container.style.flexDirection = "column";
+      container.style.width = "100%";
 
-  let min = 0;
-  let max = 1;
-  let value = 0;
-  if(filterSelect.value === "UnsharpAvgFilter"){
-      min = 0;
-      max = 1;
-      value = 0;
-  }
-  else{
-      min = 1;
-      max = 100;
-      value = 1;
-  }
-  // Create a container for the slider and labels
-  let container = document.createElement("div");
-  container.style.display = "flex";
-  container.style.flexDirection = "column";
-  container.style.width = "100%";
+      // Create the slider element
+      let slider = document.createElement("input");
+      slider.setAttribute("type", "range");
+      slider.setAttribute("min", min);
+      slider.setAttribute("max", max);
+      slider.setAttribute("step", "0.01");
+      slider.setAttribute("value", value);
+      slider.setAttribute("id", "k-slider");
 
-  // Create the slider element
-  let slider = document.createElement("input");
-  slider.setAttribute("type", "range");
-  slider.setAttribute("min", min);
-  slider.setAttribute("max", max);
-  slider.setAttribute("step", "0.01");
-  slider.setAttribute("value", value);
-  slider.setAttribute("id", "k-slider");
+      // Create the label for the slider
+      let label = document.createElement("label");
+      label.setAttribute("for", "k-slider");
+      label.innerHTML = "k:";
+      label.style.textAlign = "center";
 
-  // Create the label for the slider
-  let label = document.createElement("label");
-  label.setAttribute("for", "k-slider");
-  label.innerHTML = "k:";
-  label.style.textAlign = "center";
+      // Create the span element to display the slider value
+      let valueSpan = document.createElement("span");
+      valueSpan.setAttribute("id", "k-value");
+      valueSpan.innerHTML = value;
+      valueSpan.style.marginBottom = "0.2em";
 
-  // Create the span element to display the slider value
-  let valueSpan = document.createElement("span");
-  valueSpan.setAttribute("id", "k-value");
-  valueSpan.innerHTML = value;
-  valueSpan.style.marginBottom = "0.2em";
+      // Append the slider and labels to the container
+      container.appendChild(label);
+      container.appendChild(slider);
+      container.appendChild(valueSpan);
 
-  // Append the slider and labels to the container
-  container.appendChild(label);
-  container.appendChild(slider);
-  container.appendChild(valueSpan);
+      // Insert the container into the extra-parameters div
+      extraParametersDiv.appendChild(container);
 
-  // Insert the container into the extra-parameters div
-  extraParametersDiv.appendChild(container);
+      // Make the extra-parameters div visible
+      extraParametersDiv.style.visibility = "visible";
 
-  // Make the extra-parameters div visible
-  extraParametersDiv.style.visibility = "visible";
+      // Add event listener to the slider to update value display when the slider is changed
+      slider.addEventListener("input", function () {
+        document.querySelector("#k-value").innerHTML = this.value;
+      });
+    } else if (filterSelect.value === "RobertCrossGradient") {
+      var kernelLabel = document.createElement("label");
+      kernelLabel.innerHTML = "Choose Kernel";
+      extraParametersDiv.appendChild(kernelLabel);
 
-  // Add event listener to the slider to update value display when the slider is changed
-  slider.addEventListener("input", function () {
-    document.querySelector("#k-value").innerHTML = this.value;
+      // Create a div to contain the radio buttons
+      var radioContainer = document.createElement("div");
+      extraParametersDiv.appendChild(radioContainer);
+
+      // Create the first radio button [1,0] and its label
+      var radioBtn1 = document.createElement("input");
+      radioBtn1.type = "radio";
+      radioBtn1.name = "kernelOption";
+      radioBtn1.value = "0";
+
+      var label1 = document.createElement("label");
+      label1.innerHTML = "[[0,-1],[1,0]]";
+      label1.style.marginLeft = "0.4em";
+
+      label1.addEventListener("click", function () {
+        radioBtn1.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container1 = document.createElement("div");
+      container1.style.display = "flex"; // Display as flex
+      container1.style.alignItems = "center"; // Align items vertically in the center
+      container1.style.marginBottom = "10px"; // Add space between the radio button and label
+      container1.appendChild(radioBtn1);
+      container1.appendChild(label1);
+
+      // Append the container to the radio container div
+      radioContainer.appendChild(container1);
+
+      // Create the second radio button [0,1] and its label
+      var radioBtn2 = document.createElement("input");
+      radioBtn2.type = "radio";
+      radioBtn2.name = "kernelOption";
+      radioBtn2.value = "1";
+
+      var label2 = document.createElement("label");
+      label2.innerHTML = "[[-1,0],[0,1]]";
+      label2.style.marginLeft = "0.4em";
+      label2.addEventListener("click", function () {
+        radioBtn2.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container2 = document.createElement("div");
+      container2.style.display = "flex"; // Display as flex
+      container2.style.alignItems = "center"; // Align items vertically in the center
+      container2.style.marginBottom = "10px"; // Add space between the radio button and label
+      container2.appendChild(radioBtn2);
+      container2.appendChild(label2);
+
+      // Append the container to the radio container div
+      radioContainer.appendChild(container2);
+    } else if (filterSelect.value === "SobelOperator") {
+      var kernelLabel = document.createElement("label");
+      kernelLabel.innerHTML = "Choose Kernel";
+      extraParametersDiv.appendChild(kernelLabel);
+
+      // Create a div to contain the radio buttons
+      var radioContainer = document.createElement("div");
+      extraParametersDiv.appendChild(radioContainer);
+
+      // Create the first radio button [1,0] and its label
+      var radioBtn1 = document.createElement("input");
+      radioBtn1.type = "radio";
+      radioBtn1.name = "kernelOption";
+      radioBtn1.value = "0";
+
+      var label1 = document.createElement("label");
+      label1.innerHTML = "[[-1,-2,-1],[0,0,0],[1,2,1]]";
+      label1.style.marginLeft = "0.4em";
+
+      label1.addEventListener("click", function () {
+        radioBtn1.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container1 = document.createElement("div");
+      container1.style.display = "flex"; // Display as flex
+      container1.style.alignItems = "center"; // Align items vertically in the center
+      container1.style.marginBottom = "10px"; // Add space between the radio button and label
+      container1.appendChild(radioBtn1);
+      container1.appendChild(label1);
+
+      // Append the container to the radio container div
+      radioContainer.appendChild(container1);
+
+      // Create the second radio button [0,1] and its label
+      var radioBtn2 = document.createElement("input");
+      radioBtn2.type = "radio";
+      radioBtn2.name = "kernelOption";
+      radioBtn2.value = "1";
+
+      var label2 = document.createElement("label");
+      label2.innerHTML = "[[-1,0,-1],[-2,0,2],[-1,0,1]]";
+      label2.style.marginLeft = "0.4em";
+      label2.addEventListener("click", function () {
+        radioBtn2.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container2 = document.createElement("div");
+      container2.style.display = "flex"; // Display as flex
+      container2.style.alignItems = "center"; // Align items vertically in the center
+      container2.style.marginBottom = "10px"; // Add space between the radio button and label
+      container2.appendChild(radioBtn2);
+      container2.appendChild(label2);
+
+      // Append the container to the radio container div
+      radioContainer.appendChild(container2);
+    } else if (filterSelect.value === "LaplaceOperator") {
+      var kernelLabel = document.createElement("label");
+      kernelLabel.innerHTML = "Choose Kernel";
+      extraParametersDiv.appendChild(kernelLabel);
+
+      // Create a div to contain the radio buttons
+      var radioContainer = document.createElement("div");
+      extraParametersDiv.appendChild(radioContainer);
+
+      // Create the first radio button [1,0] and its label
+      var radioBtn1 = document.createElement("input");
+      radioBtn1.type = "radio";
+      radioBtn1.name = "kernelOption";
+      radioBtn1.value = "0";
+
+      var label1 = document.createElement("label");
+      label1.innerHTML = "[[0,1,0],[1,-4,1],[0,1,0]]";
+      label1.style.marginLeft = "0.4em";
+
+      label1.addEventListener("click", function () {
+        radioBtn1.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container1 = document.createElement("div");
+      container1.style.display = "flex"; // Display as flex
+      container1.style.alignItems = "center"; // Align items vertically in the center
+      container1.style.marginBottom = "10px"; // Add space between the radio button and label
+      container1.appendChild(radioBtn1);
+      container1.appendChild(label1);
+
+      // Append the container to the radio container div
+      radioContainer.appendChild(container1);
+
+      // Create the second radio button [0,1] and its label
+      var radioBtn2 = document.createElement("input");
+      radioBtn2.type = "radio";
+      radioBtn2.name = "kernelOption";
+      radioBtn2.value = "1";
+
+      var label2 = document.createElement("label");
+      label2.innerHTML = "[[0,-1,0],[-1,4,-1],[0,-1,0]]";
+      label2.style.marginLeft = "0.4em";
+      label2.addEventListener("click", function () {
+        radioBtn2.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container2 = document.createElement("div");
+      container2.style.display = "flex"; // Display as flex
+      container2.style.alignItems = "center"; // Align items vertically in the center
+      container2.style.marginBottom = "10px"; // Add space between the radio button and label
+      container2.appendChild(radioBtn2);
+      container2.appendChild(label2);
+
+      // Append the container to the radio container div
+      radioContainer.appendChild(container2);
+
+      // Create the third radio button [-1,0] and its label
+      var radioBtn3 = document.createElement("input");
+      radioBtn3.type = "radio";
+      radioBtn3.name = "kernelOption";
+      radioBtn3.value = "2";
+
+      var label3 = document.createElement("label");
+      label3.innerHTML = "[[1,1,1],[1,-8,1],[1,1,1]]";
+      label3.style.marginLeft = "0.4em";
+      label3.addEventListener("click", function () {
+        radioBtn3.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container3 = document.createElement("div");
+      container3.style.display = "flex"; // Display as flex
+      container3.style.alignItems = "center"; // Align items vertically in the center
+      container3.style.marginBottom = "10px"; // Add space between the radio button and label
+      container3.appendChild(radioBtn3);
+      container3.appendChild(label3);
+      radioContainer.appendChild(container3);
+
+      // Create the third radio button [-1,0] and its label
+      var radioBtn4 = document.createElement("input");
+      radioBtn4.type = "radio";
+      radioBtn4.name = "kernelOption";
+      radioBtn4.value = "3";
+
+      var label4 = document.createElement("label");
+      label4.innerHTML = "[[-1,-1,-1],[-1,8,-1],[-1,-1,-1]]";
+      label4.style.marginLeft = "0.4em";
+      label4.addEventListener("click", function () {
+        radioBtn4.checked = true; // Set the radio button as checked
+      });
+
+      // Create a container div for the radio button and label
+      var container4 = document.createElement("div");
+      container4.style.display = "flex"; // Display as flex
+      container4.style.alignItems = "center"; // Align items vertically in the center
+      container4.style.marginBottom = "10px"; // Add space between the radio button and label
+      container4.appendChild(radioBtn4);
+      container4.appendChild(label4);
+      radioContainer.appendChild(container4);
+    }
   });
-} else if (filterSelect.value === "RobertCrossGradient") {
-  var kernelLabel = document.createElement("label");
-  kernelLabel.innerHTML = "Choose Kernel";
-  extraParametersDiv.appendChild(kernelLabel);
-
-  // Create a div to contain the radio buttons
-  var radioContainer = document.createElement("div");
-  extraParametersDiv.appendChild(radioContainer);
-
-  // Create the first radio button [1,0] and its label
-  var radioBtn1 = document.createElement("input");
-  radioBtn1.type = "radio";
-  radioBtn1.name = "kernelOption";
-  radioBtn1.value = "0";
-
-  var label1 = document.createElement("label");
-  label1.innerHTML = "[[0,-1],[1,0]]";
-  label1.style.marginLeft = "0.4em";
-
-  label1.addEventListener("click", function () {
-    radioBtn1.checked = true; // Set the radio button as checked
-  });
-
-  // Create a container div for the radio button and label
-  var container1 = document.createElement("div");
-  container1.style.display = "flex"; // Display as flex
-  container1.style.alignItems = "center"; // Align items vertically in the center
-  container1.style.marginBottom = "10px"; // Add space between the radio button and label
-  container1.appendChild(radioBtn1);
-  container1.appendChild(label1);
-
-  // Append the container to the radio container div
-  radioContainer.appendChild(container1);
-
-  // Create the second radio button [0,1] and its label
-  var radioBtn2 = document.createElement("input");
-  radioBtn2.type = "radio";
-  radioBtn2.name = "kernelOption";
-  radioBtn2.value = "1";
-
-  var label2 = document.createElement("label");
-  label2.innerHTML = "[[-1,0],[0,1]]";
-  label2.style.marginLeft = "0.4em";
-  label2.addEventListener("click", function () {
-    radioBtn2.checked = true; // Set the radio button as checked
-  });
-
-  // Create a container div for the radio button and label
-  var container2 = document.createElement("div");
-  container2.style.display = "flex"; // Display as flex
-  container2.style.alignItems = "center"; // Align items vertically in the center
-  container2.style.marginBottom = "10px"; // Add space between the radio button and label
-  container2.appendChild(radioBtn2);
-  container2.appendChild(label2);
-
-  // Append the container to the radio container div
-  radioContainer.appendChild(container2);
-}
-});
-
-
 
 applyFilterButton.addEventListener("click", async function () {
   const filterType = filterSelect.value;
@@ -161,25 +314,26 @@ applyFilterButton.addEventListener("click", async function () {
   const extraValuesArray = [];
 
   const extraValuesSpans = document.querySelectorAll(".extra-parameters span");
-  const extraValuesRadios = document.querySelectorAll('input[name="kernelOption"]');
+  const extraValuesRadios = document.querySelectorAll(
+    'input[name="kernelOption"]'
+  );
 
   console.log(extraValuesRadios);
   extraValuesSpans.forEach((span) => {
     extraValuesArray.push(span.innerHTML);
   });
-  
+
   extraValuesRadios.forEach((radio) => {
     radio.checked && extraValuesArray.push(radio.value);
   });
 
-
-
   console.log(extraValuesArray);
-
 
   const body = `image_data=${encodeURIComponent(
     uploadedImage.src
-  )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraParams=${extraValuesArray.join(',')}`;
+  )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraParams=${extraValuesArray.join(
+    ","
+  )}`;
 
   const response = await fetch("/process-image", {
     method: "POST",

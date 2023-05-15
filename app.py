@@ -173,22 +173,22 @@ def RobertCrossGradient(image, kernel_type):
     Output_image=unpad_image(Output_image, start_row, end_row, start_col, end_col)
     return Output_image
 
+def GetBack_Values(kernel_size):
+    Dic= {}
+    Value = 3
+    Diff = 2
+    for i in range(0,50):
+        Dic.update({Value :Value - Diff})
+        Value += 2
+        Diff += 1
+    return Dic
+
 def UnsharpAvgFilter(Kernel_size, image, K_Value=0.1):
     Kernel_size = (Kernel_size, Kernel_size)
     Padded_UnSharp_image,start_row2, end_row2, start_col2, end_col2 = pad_image(image,Kernel_size)
     Unsharp_Avg_image = Padded_UnSharp_image.copy()
     Original_image = Padded_UnSharp_image.copy()
     Mask_image = Padded_UnSharp_image.copy()
-
-    def GetBack_Values(kernel_size):
-        Dic= {}
-        Value = 3
-        Diff = 2
-        for i in range(0,50):
-            Dic.update({Value :Value - Diff})
-            Value += 2
-            Diff += 1
-        return Dic
     
     Kernel_dimensions = Kernel_size[0] * Kernel_size[1]
     Back_Value = GetBack_Values(Kernel_size)
@@ -232,15 +232,6 @@ def HighboostFilter(Kernel_size, image, K_Value=1.1):
     Original_image = Padded_UnSharp_image.copy()
     Mask_image = Padded_UnSharp_image.copy()
 
-    def GetBack_Values(kernel_size):
-        Dic= {}
-        Value = 3
-        Diff = 2
-        for i in range(0,50):
-            Dic.update({Value :Value - Diff})
-            Value += 2
-            Diff += 1
-        return Dic
     
     Kernel_dimensions = Kernel_size[0] * Kernel_size[1]
     Back_Value = GetBack_Values(Kernel_size)
@@ -277,6 +268,81 @@ def HighboostFilter(Kernel_size, image, K_Value=1.1):
     Highboost_image= unpad_image(Original_image,start_row2, end_row2, start_col2, end_col2)
     return Highboost_image
 
+
+def LaplaceOperator(Kernel_size, image, kernel_type=0):
+    Kernel_size = (Kernel_size, Kernel_size)
+    Laplace_paded_image, start_row3, end_row3, start_col3, end_col3 = pad_image(image,Kernel_size)
+    Back_Value = GetBack_Values(Kernel_size)
+    Laplace_image1=Laplace_paded_image.copy()
+    Laplace_kernel1 =[]
+    
+    if kernel_type == 0:
+        Laplace_kernel1 = [[0,1,0],[1,-4,1],[0,1,0]]
+    elif kernel_type == 1:
+        Laplace_kernel1 = [[0,-1,0],[-1,4,-1],[0,-1,0]]
+    elif kernel_type == 2:
+        Laplace_kernel1 = [[1,1,1],[1,-8,1],[1,1,1]]
+    elif kernel_type == 3:
+        Laplace_kernel1 = [[-1,-1,-1],[-1,8,-1],[-1,-1,-1]]
+    
+    V1 = 0
+    Result = 0
+    for r in range(start_row3,end_row3):
+        for c in range(start_col3,end_col3):
+            rstart = r - Back_Value[Kernel_size[0]]
+            cstart = c - Back_Value[Kernel_size[0]]
+            Result = 0
+            i = 0
+            while i < Kernel_size[0] and rstart < end_row3 and rstart >= start_row3:
+                k = 0
+                while k < Kernel_size[0] and cstart < end_col3 and cstart >= start_col3:
+                    V1 = Laplace_paded_image[rstart][cstart] * Laplace_kernel1[i][k]
+                    Result += V1
+                    cstart += 1
+                    k +=1
+                i += 1
+                rstart += 1
+            Laplace_image1[r][c] = Result
+            
+    Laplace_image1 = unpad_image(Laplace_image1,start_row3,end_row3,start_col3,end_col3)
+    return Laplace_image1
+
+def SobelOperator(Kernel_size, image, kernel_type=0):
+    Kernel_size =(Kernel_size,Kernel_size)
+    Sobel_paded_image, start_row4, end_row4, start_col4, end_col4 = pad_image(image,Kernel_size)
+    Kernel_dimensions = Kernel_size[0] * Kernel_size[1]
+    Back_Value = GetBack_Values(Kernel_size)
+    
+    Sobel_image1 = Sobel_paded_image.copy()
+    Sobel_kernel1 = []
+    if kernel_type == 0:
+        Sobel_kernel1 = [[-1,-2,-1],[0,0,0],[1,2,1]]
+    elif kernel_type == 1:
+        Sobel_kernel1 = [[-1,0,-1],[-2,0,2],[-1,0,1]]
+    
+    V1 = 0
+    Result = 0
+    for r in range(start_row4,end_row4):
+        for c in range(start_col4,end_col4):
+            rstart = r - Back_Value[Kernel_size[0]]
+            cstart = c - Back_Value[Kernel_size[0]]
+            Result = 0
+            i = 0
+            while i < Kernel_size[0] and rstart < end_row4 and rstart >= start_row4:
+                k = 0
+                while k < Kernel_size[0] and cstart < end_col4 and cstart >= start_col4:
+                    V1 = Sobel_paded_image[rstart][cstart] * Sobel_kernel1[i][k]
+                    Result += V1
+                    cstart += 1
+                    k +=1
+                i += 1
+                rstart += 1
+            Sobel_image1[r][c] = Result  
+            
+    Sobel_image1 = unpad_image(Sobel_image1,start_row4,end_row4,start_col4,end_col4)
+    return Sobel_image1
+
+
 @app.route('/process-image', methods=['POST'])
 def process_image():
     image_data = request.form.get('image_data')
@@ -311,6 +377,14 @@ def process_image():
         K_value = float(extra_parameters[0])
         print('K_value',K_value)
         processed_image = HighboostFilter(kernel_size, gray_image, K_value)
+    elif filter_type == 'LaplaceOperator':
+        kernel_type = int(extra_parameters[0])
+        print(kernel_type, kernel_size)
+        processed_image = LaplaceOperator(kernel_size, gray_image, kernel_type)
+    elif filter_type == 'SobelOperator':
+        kernel_type = int(extra_parameters[0])
+        print(kernel_type, kernel_size)
+        processed_image = SobelOperator(kernel_size, gray_image, kernel_type)
 
     retval1, buffer1 = cv2.imencode('.jpg', processed_image)
     retval2, buffer2 = cv2.imencode('.jpg', gray_image)
