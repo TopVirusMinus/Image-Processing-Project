@@ -8,6 +8,35 @@ const kernelSizeSlider = document.querySelector("#kernel-size");
 const kernelSizeValue = document.querySelector("#kernel-size-value");
 kernelSizeValue.style.textAlign = "left";
 
+function createSlider(id, min, max, value) {
+  let slider = document.createElement("input");
+  slider.setAttribute("type", "range");
+  slider.setAttribute("min", min);
+  slider.setAttribute("max", max);
+  slider.setAttribute("value", value);
+  slider.setAttribute("id", id);
+  return slider;
+}
+
+function createLabel(forAttr, innerHtml) {
+  let label = document.createElement("label");
+  label.setAttribute("for", forAttr);
+  label.innerHTML = innerHtml;
+  label.style.textAlign = "center";
+  return label;
+}
+
+function createValueSpan(id, value) {
+  let valueSpan = document.createElement("span");
+  valueSpan.setAttribute("id", id);
+  valueSpan.innerHTML = value;
+  valueSpan.style.marginBottom = "0.2em";
+  return valueSpan;
+}
+
+function appendChildren(parent, children) {
+  children.forEach((child) => parent.appendChild(child));
+}
 
 function createRadioButton(radioContainer, name, value, innerHTML) {
   // Create a radio button and its label
@@ -129,6 +158,59 @@ document
       slider.addEventListener("input", function () {
         document.querySelector("#k-value").innerHTML = this.value;
       });
+    }else if (filterSelect.value == "apply_uniform_noise") {
+      let extraParametersDiv = document.querySelector(".extra-parameters");
+
+
+        let min = 0;
+        let max = 255;
+        let valueMin = 0;
+        let valueMax = 255;
+
+        // Create a containers for the sliders and labels
+        let containerMin = document.createElement("div");
+        let containerMax = document.createElement("div");
+
+        containerMin.style.display = "flex";
+        containerMin.style.flexDirection = "column";
+        containerMin.style.width = "100%";
+
+        containerMax.style.display = "flex";
+        containerMax.style.flexDirection = "column";
+        containerMax.style.width = "100%";
+
+        // Create the slider elements
+        let sliderMin = createSlider("min-slider", min, max, valueMin);
+        let sliderMax = createSlider("max-slider", min, max, valueMax);
+
+        // Create the labels for the sliders
+        let labelMin = createLabel("min-slider", "Min:");
+        let labelMax = createLabel("max-slider", "Max:");
+
+        // Create the span elements to display the slider values
+        let valueSpanMin = createValueSpan("min-value", valueMin);
+        let valueSpanMax = createValueSpan("max-value", valueMax);
+
+        // Append the sliders and labels to the containers
+        appendChildren(containerMin, [labelMin, sliderMin, valueSpanMin]);
+        appendChildren(containerMax, [labelMax, sliderMax, valueSpanMax]);
+
+        // Insert the containers into the extra-parameters div
+        appendChildren(extraParametersDiv, [containerMin, containerMax]);
+
+        // Make the extra-parameters div visible
+        extraParametersDiv.style.visibility = "visible";
+
+        // Add event listeners to the sliders to update value display when the sliders are changed
+        sliderMin.addEventListener("input", function () {
+          document.querySelector("#min-value").innerHTML = this.value;
+        });
+
+        sliderMax.addEventListener("input", function () {
+          document.querySelector("#max-value").innerHTML = this.value;
+        });
+      
+
     } else if (filterSelect.value === "RobertCrossGradient") {
       var kernelLabel = document.createElement("label");
       kernelLabel.innerHTML = "Choose Kernel";

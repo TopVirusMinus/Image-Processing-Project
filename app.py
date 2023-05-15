@@ -377,6 +377,15 @@ def apply_gaussian_noise(image, mean, stdev):
     gaussian_noise_image = np.clip(gaussian_noise_image, 0, 255)
 
     return gaussian_noise_image
+
+def apply_uniform_noise(image, min_value, max_value):
+    new_img = image.copy()
+    for i in range(len(image)):
+        for j in range(len(image[i])):
+            new_img[j][i] = np.clip(image[j][i] + (min_value + (max_value - min_value) * random.random()), 0, 255)
+    
+    return new_img
+
 @app.route('/process-image', methods=['POST'])
 def process_image():
     image_data = request.form.get('image_data')
@@ -403,6 +412,7 @@ def process_image():
         'SobelOperator': lambda: SobelOperator(kernel_size, gray_image, int(extra_parameters[0])),
         'apply_impulse_noise': lambda: apply_impulse_noise(gray_image),
         'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+        'apply_uniform_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
     }
     
     processed_image = []
