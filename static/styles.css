@@ -1,21 +1,41 @@
+:root {
+  --primary-color: #007bff;
+  --primary-color-hover: #65adf9;
+  --secondary-color: #f1f1f1;
+  --background-gradient-start: #2e2e50;
+  --background-gradient-end: #25376a;
+  --text-color: #ffffff;
+  --text-color-secondary: #000000;
+  --font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  transition: all 0.3s ease;
 }
 
-body,
-html {
-  background: #eee;
-  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+html, body {
+  height: 100vh;
+  background: linear-gradient(112.1deg, var(--background-gradient-start) 11.4%, var(--background-gradient-end) 70.2%);
+  color: var(--text-color);
+  font-family: var(--font-family);
+  overflow: hidden;
 }
 
-/* Styles for the upload form */
+.title{
+  font-size: 2.5em;
+  background: linear-gradient(to right, #D9AFD9 0%, #97D9E1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .upload-form {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10vh; /* Adjust the margin top to move the content up or down */
+  margin-top: 10vh;
 }
 
 .upload-form h2 {
@@ -29,7 +49,6 @@ html {
   margin-bottom: 1rem;
 }
 
-/* Styles for the image and filters */
 .image-container {
   display: flex;
   flex-direction: column;
@@ -42,42 +61,58 @@ img {
   margin-top: 1em;
   max-width: 60%;
   max-height: 40vh;
-  
 }
 
-.filter-select {
+.filter-select, .dropbtn {
   margin-top: 2em;
   padding: 0.5rem 1rem;
   border-radius: 0.25rem;
-  background-color: #007bff;
-  color: #fff;
+  background-color: var(--primary-color);
+  color: var(--text-color);
   cursor: pointer;
-  margin-bottom: 1em;
   width: 15em;
 }
 
-.dropbtn {
-  background-color: #007bff;
-  color: #fff;
-  padding: 0.5rem 1rem;
-  border-radius: 0.25rem;
-  cursor: pointer;
+
+.custom-file-upload {
+    position: relative;
+    display: inline-block;
 }
 
-.dropbtn:hover {
-  background-color: #65adf9;
+#image-upload {
+    display: none;
+}
+
+.custom-file-upload label {
+    padding: 10px 20px;
+    background: #3498db; 
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all .4s ease-out;
+    display: inline-block;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.custom-file-upload label:hover {
+    background: #2980b9;
+}
+.filter-select{
+  margin-bottom: 2em;
+}
+
+.filter-select:hover, .dropbtn:hover {
+  background-color: var(--primary-color-hover);
 }
 
 .filter-select option {
-  color: black;
+  color: var(--text-color-secondary);
   padding: 12px 16px;
   text-decoration: none;
   display: block;
-  background-color: #f1f1f1;
-}
-
-.filter-select:hover {
-  background-color: #65adf9;
+  background-color: var(--secondary-color);
 }
 
 .images {
@@ -88,7 +123,11 @@ img {
   align-items: center;
 }
 
-span {
-  font-weight: bold;
-  font-size: 2em;
+.kernel_slider_container{
+  display: flex;
+  flex-direction: column;
+}
+
+.kernel_size_label{
+  text-align: center;
 }

@@ -33,6 +33,7 @@ def unpad_image(padded_image, start_row, end_row, start_col, end_col):
     unpadded_image = padded_image[start_row:end_row, start_col:end_col]
     return unpadded_image
 
+
 def MedianFilter(Kernel_size, image):
     kernel=[]
     k=[Kernel_size,Kernel_size]
@@ -145,14 +146,95 @@ def MinimumFilter(Kernel_size, image):
     Image_After = unpad_image(Image_After, start_row, end_row, start_col, end_col)
     return Image_After
 
+def RobertCrossGradient(image):
+    padded_image, start_row, end_row, start_col, end_col = pad_image(image,(2,2))
+    Output_image = padded_image.copy()
+    Robert_kernel1 =[[-1,0],
+            [0,1]]
+
+    Result = 0
+    for r in range(start_row,end_row):
+        for c in range(start_col,end_col):
+            rs = r;  
+            Result = 0
+            for i in range(2):
+                cs = c
+                for k in range(2):
+                    Value = padded_image[rs,cs] * Robert_kernel1[i][k] 
+                    Result += Value
+                    cs = cs+ 1
+                rs = rs + 1 
+
+            Output_image[r][c] = Result  
+    Output_image=unpad_image(Output_image, start_row, end_row, start_col, end_col)
+    return Output_image
+
+def UnsharpAvgFilter(Kernel_size, image, K_Value=0.1):
+    Kernel_size = (Kernel_size, Kernel_size)
+    Padded_UnSharp_image,start_row2, end_row2, start_col2, end_col2 = pad_image(image,Kernel_size)
+    Unsharp_Avg_image = Padded_UnSharp_image.copy()
+    Original_image = Padded_UnSharp_image.copy()
+    Mask_image = Padded_UnSharp_image.copy()
+
+    def GetBack_Values(kernel_size):
+        Dic= {}
+        Value = 3
+        Diff = 2
+        for i in range(0,50):
+            Dic.update({Value :Value - Diff})
+            Value += 2
+            Diff += 1
+        return Dic
+    
+    Kernel_dimensions = Kernel_size[0] * Kernel_size[1]
+    Back_Value = GetBack_Values(Kernel_size)
+    V1 = 0
+    Avg = 0
+    Avg_Result = 0
+    Flag = False
+    
+    for r in range(start_row2,end_row2):
+        for c in range(start_col2,end_col2):
+            rstart = r - Back_Value[Kernel_size[0]]
+            cstart = c - Back_Value[Kernel_size[0]]
+            Avg = 0
+            i = 0
+            while i < Kernel_size[0] and rstart < end_row2 and rstart >= start_row2:
+                k = 0
+                while k < Kernel_size[0] and cstart < end_col2 and cstart >= start_col2:
+                    V1 = Padded_UnSharp_image[rstart][cstart]
+                    Avg += V1
+                    cstart += 1
+                    k +=1
+                i += 1
+                rstart += 1
+
+            Avg_Result = Avg / Kernel_dimensions
+            Unsharp_Avg_image[r][c] =  Avg_Result
+    for r in range(start_row2,end_row2):
+      for c in range(start_col2,end_col2):
+        Mask_image[r][c] = Padded_UnSharp_image[r][c] - Unsharp_Avg_image[r][c]
+        
+    for r in range(start_row2,end_row2):
+        for c in range(start_col2,end_col2):
+            Padded_UnSharp_image[r][c] += (K_Value * Mask_image[r][c])
+    
+    Final_UnSharp_image= unpad_image(Padded_UnSharp_image,start_row2, end_row2, start_col2, end_col2)
+    return Final_UnSharp_image
+
+def HighboostFilter(Kernel_size, image):
+    pass
+    
 
 @app.route('/process-image', methods=['POST'])
 def process_image():
     image_data = request.form.get('image_data')
     filter_type = request.form.get('filter_type')
     kernel_size = int(request.form.get('kernel_size'))
+    extra_parameters = request.form.get('extraParams').split(',')
     
     print(filter_type)
+    print(extra_parameters)
     
     image_data = base64.b64decode(image_data.split(',')[1])
     nparr = np.frombuffer(image_data, np.uint8)
@@ -167,6 +249,14 @@ def process_image():
         processed_image = MaxFilter(kernel_size, gray_image)
     elif filter_type == 'MinimumFilter':
         processed_image = MinimumFilter(kernel_size, gray_image)
+        processed_image = MaxFilter(kernel_size, gray_image)
+    elif filter_type == 'RobertCrossGradient':
+        processed_image = RobertCrossGradient(gray_image)
+        processed_image = MaxFilter(kernel_size, gray_image)
+    elif filter_type == 'UnsharpAvgFilter':
+        K_value = float(extra_parameters[0])
+        print('K_value',K_value)
+        processed_image = UnsharpAvgFilter(kernel_size, gray_image, K_value)
 
     retval1, buffer1 = cv2.imencode('.jpg', processed_image)
     retval2, buffer2 = cv2.imencode('.jpg', gray_image)
