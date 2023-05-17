@@ -399,7 +399,23 @@ def process_image():
     image_data = base64.b64decode(image_data.split(',')[1])
     nparr = np.frombuffer(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    height, width = gray_image.shape[:2]
+    max_size = 512
+
+    # Find the scaling factor
+    scale = min(max_size/width, max_size/height)
+
+    # Calculate the new dimensions of the image
+    new_width = int(scale * width)
+    new_height = int(scale * height)
+
+    # Resize the image
+    #gray_image = cv2.resize(gray_image, (new_width, new_height), interpolation=cv2.INTER_AREA)
+    
+    print(gray_image.shape)
+
     filter_functions = {
         'MedianFilter': lambda: MedianFilter(kernel_size, gray_image),
         'AveragingFilter': lambda: AveragingFilter(kernel_size, gray_image),
@@ -426,6 +442,9 @@ def process_image():
     
     processed_image_base64 = base64.b64encode(buffer1).decode('utf-8')
     greyed_original_base64 = base64.b64encode(buffer2).decode('utf-8')
+    
+    #processed_image_base64 = cv2.resize(processed_image_base64, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
     print(np.count_nonzero(processed_image - gray_image))
     return {
         'original_greyed': f'data:image/jpeg;base64,{greyed_original_base64}',
