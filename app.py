@@ -386,6 +386,62 @@ def apply_uniform_noise(image, min_value, max_value):
     
     return new_img
 
+def fourier_transform(img):
+    height, width = img.shape
+    dft = np.zeros((height, width), dtype=complex)
+
+    ct=0
+        
+    for u in range(height):
+        ct+=1
+        for v in range(width):
+            total = 0
+            for x in range(height):
+                for y in range(width):
+                    #print("dft[0,0]--- >",dft[0,0].real,"img[x,y]--- >",imgp[x, y],"imgp[x, y] * np.exp(-2j * np.pi * (u*x/height + v*y/width)--- >",imgp[x, y] * np.exp(-2j * np.pi * (u*x/height + v*y/width)))
+                    #input()
+                    total += img[x, y] * np.exp(-2j * np.pi * ((u * x) / height + (v * y) / width))
+            dft[u, v] = total
+    
+    dft_shift = np.zeros((height, width), dtype=np.complex128)
+    for u in range(height):
+        for v in range(width):
+            dft_shift[u, v] = dft[u - height // 2, v - width // 2]
+
+    spectrum = 20*np.log(np.abs(dft_shift))
+
+    
+    return spectrum
+
+def histogram_equalization(img):    
+    hist = np.zeros(256)
+    
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            hist[img[i, j]] += 1
+            
+    cdf = np.zeros(256)
+    cdf[0] = hist[0]
+    for i in range(1, 256):
+        cdf[i] = cdf[i-1] + hist[i]
+
+    nk = img.shape[0] * img.shape[1]
+    nnk = np.round(nk / 256)
+    norm_hist = np.round(cdf / nnk)
+    maping = np.zeros(256)
+    for i in range(256):
+        if norm_hist[i] <= 255:
+            maping[i] = norm_hist[i]
+        else:
+            maping[i] = 255
+
+    equalized_img = img.copy()
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            equalized_img[i, j] = maping[img[i, j]]
+    
+    return equalized_img
+
 @app.route('/process-image', methods=['POST'])
 def process_image():
     image_data = request.form.get('image_data')
@@ -429,6 +485,8 @@ def process_image():
         'apply_impulse_noise': lambda: apply_impulse_noise(gray_image),
         'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'apply_uniform_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+        'fourier_transform': lambda: fourier_transform(gray_image),
+        'histogram_equalization': lambda: histogram_equalization(gray_image),
     }
     
     processed_image = []
