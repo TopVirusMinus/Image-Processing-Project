@@ -446,6 +446,27 @@ def fourier_transform(img, k=20):
 
     spectrum = k*np.log(np.abs(dft_shift))
 
+    # shape = dft_shift.shape
+        
+
+    # shift_amounts = [(size + 1) // 2 for size in shape]
+        
+    # ishifted_DFT = np.roll(dft_shift, shift_amounts, tuple(range(dft_shift.ndim)))
+        
+    # ishifted_DFT
+
+    # M, N = ishifted_DFT.shape
+
+    # inverseImg = np.zeros_like(ishifted_DFT, dtype=complex)
+
+    # for x in range(M):
+    #     for y in range(N):
+    #         for u in range(M):
+    #             for v in range(N):
+    #                 inverseImg[x, y] += ishifted_DFT[u, v] * np.exp(2j * np.pi * (u*x/M + v*y/N))
+
+    # inverseImg /= M * N
+    
     return spectrum
 
 
