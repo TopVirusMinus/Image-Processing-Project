@@ -238,9 +238,11 @@ document
         );
       });
     } 
-else if (filterSelect.value === "Nearest_Neighbour") {
-  console.log("NEAREST NEIGH");
-
+else if (
+  ["Nearest_Neighbour", "Bilinear", "BicubicInterpolation"].includes(
+    filterSelect.value
+  )
+) {
   // Create a container for the slider and labels
   let container = document.createElement("div");
   container.style.display = "flex";
@@ -319,51 +321,50 @@ else if (filterSelect.value === "Nearest_Neighbour") {
     // When the slider is changed, update the innerHTML of the #h-value element
     document.querySelector("#h-value").innerHTML = this.value;
   });
-    }
-    else if (filterSelect.value === "apply_gaussian_noise") {
-      let extraParametersDiv = document.querySelector(".extra-parameters"); // Assuming this is your div
+} else if (filterSelect.value === "apply_gaussian_noise") {
+  let extraParametersDiv = document.querySelector(".extra-parameters"); // Assuming this is your div
 
-      ["mean", "std"].forEach((param) => {
-        let container = document.createElement("div");
-        container.style.display = "flex";
-        container.style.flexDirection = "column";
-        container.style.width = "100%";
+  ["mean", "std"].forEach((param) => {
+    let container = document.createElement("div");
+    container.style.display = "flex";
+    container.style.flexDirection = "column";
+    container.style.width = "100%";
 
-        // Create the slider element
-        let slider = document.createElement("input");
-        slider.setAttribute("type", "range");
-        slider.setAttribute("min", param === "mean" ? "-50" : "1");
-        slider.setAttribute("max", param === "mean" ? "50" : "100");
-        slider.setAttribute("step", "0.01");
-        slider.setAttribute("value", param === "mean" ? "0" : "20");
-        slider.setAttribute("id", `${param}-slider`);
+    // Create the slider element
+    let slider = document.createElement("input");
+    slider.setAttribute("type", "range");
+    slider.setAttribute("min", param === "mean" ? "-50" : "1");
+    slider.setAttribute("max", param === "mean" ? "50" : "100");
+    slider.setAttribute("step", "0.01");
+    slider.setAttribute("value", param === "mean" ? "0" : "20");
+    slider.setAttribute("id", `${param}-slider`);
 
-        // Create the label for the slider
-        let label = document.createElement("label");
-        label.setAttribute("for", `${param}-slider`);
-        label.innerHTML = `${param}:`;
-        label.style.textAlign = "center";
+    // Create the label for the slider
+    let label = document.createElement("label");
+    label.setAttribute("for", `${param}-slider`);
+    label.innerHTML = `${param}:`;
+    label.style.textAlign = "center";
 
-        // Create the span element to display the slider value
-        let valueSpan = document.createElement("span");
-        valueSpan.setAttribute("id", `${param}-value`);
-        valueSpan.innerHTML = slider.getAttribute("value");
-        valueSpan.style.marginBottom = "0.2em";
+    // Create the span element to display the slider value
+    let valueSpan = document.createElement("span");
+    valueSpan.setAttribute("id", `${param}-value`);
+    valueSpan.innerHTML = slider.getAttribute("value");
+    valueSpan.style.marginBottom = "0.2em";
 
-        // Append the slider and labels to the container
-        container.appendChild(label);
-        container.appendChild(slider);
-        container.appendChild(valueSpan);
+    // Append the slider and labels to the container
+    container.appendChild(label);
+    container.appendChild(slider);
+    container.appendChild(valueSpan);
 
-        // Insert the container into the extra-parameters div
-        extraParametersDiv.appendChild(container);
+    // Insert the container into the extra-parameters div
+    extraParametersDiv.appendChild(container);
 
-        // Add event listener to the slider to update value display when the slider is changed
-        slider.addEventListener("input", function () {
-          document.querySelector(`#${param}-value`).innerHTML = this.value;
-        });
-      });
-    }
+    // Add event listener to the slider to update value display when the slider is changed
+    slider.addEventListener("input", function () {
+      document.querySelector(`#${param}-value`).innerHTML = this.value;
+    });
+  });
+}
   });
 
 applyFilterButton.addEventListener("click", async function () {

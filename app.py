@@ -421,7 +421,7 @@ def apply_uniform_noise(image, min_value, max_value):
     return new_img
 
 
-def fourier_transform(img):
+def fourier_transform(img, k=20):
     height, width = img.shape
     dft = np.zeros((height, width), dtype=complex)
 
@@ -444,7 +444,7 @@ def fourier_transform(img):
         for v in range(width):
             dft_shift[u, v] = dft[u - height // 2, v - width // 2]
 
-    spectrum = 20*np.log(np.abs(dft_shift))
+    spectrum = k*np.log(np.abs(dft_shift))
 
     return spectrum
 
@@ -608,11 +608,11 @@ def process_image():
         'SobelOperator': lambda: SobelOperator(kernel_size, gray_image, int(extra_parameters[0])),
         'apply_impulse_noise': lambda: apply_impulse_noise(gray_image),
         'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
-        'apply_uniform_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+        'apply_uniform_noise': lambda: apply_uniform_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'fourier_transform': lambda: fourier_transform(gray_image),
         'histogram_equalization': lambda: histogram_equalization(gray_image),
-        'BicubicInterpolation': lambda: BicubicInterpolation(gray_image),
-        'Bilinear': lambda: Bilinear(gray_image),
+        'BicubicInterpolation': lambda: BicubicInterpolation(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+        'Bilinear': lambda: Bilinear(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'Nearest_Neighbour': lambda: Nearest_Neighbour(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
     }
 
