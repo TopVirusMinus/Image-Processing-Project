@@ -630,7 +630,7 @@ def process_image():
         'apply_impulse_noise': lambda: apply_impulse_noise(gray_image),
         'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'apply_uniform_noise': lambda: apply_uniform_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
-        'fourier_transform': lambda: fourier_transform(gray_image),
+        'fourier_transform': lambda: fourier_transform(gray_image, int(extra_parameters[0])),
         'histogram_equalization': lambda: histogram_equalization(gray_image),
         'BicubicInterpolation': lambda: BicubicInterpolation(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'Bilinear': lambda: Bilinear(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),

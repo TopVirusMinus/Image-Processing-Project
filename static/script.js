@@ -238,134 +238,174 @@ document
         );
       });
     } 
-else if (
-  ["Nearest_Neighbour", "Bilinear", "BicubicInterpolation"].includes(
-    filterSelect.value
-  )
-) {
-  // Create a container for the slider and labels
-  let container = document.createElement("div");
-  container.style.display = "flex";
-  container.style.flexDirection = "column";
-  container.style.width = "100%";
+    else if ("fourier_transform") {
+      let container = document.createElement("div");
+      container.style.display = "flex";
+      container.style.flexDirection = "column";
+      container.style.width = "100%";
 
-  // Create the slider element
-  let slider = document.createElement("input");
-  slider.setAttribute("type", "range");
-  slider.setAttribute("min", 1);
-  slider.setAttribute("max", 10000);
-  slider.setAttribute("step", "1");
-  slider.setAttribute("value", 500);
-  slider.setAttribute("id", "w-slider");
+      // Create the slider element
+      let slider = document.createElement("input");
+      slider.setAttribute("type", "range");
+      slider.setAttribute("min", 1);
+      slider.setAttribute("max", 50);
+      slider.setAttribute("step", "1");
+      slider.setAttribute("value", 20);
+      slider.setAttribute("id", "k-slider");
 
-  // Create the label for the slider
-  let labelz = document.createElement("label");
-  labelz.setAttribute("for", "w-slider");
-  labelz.innerHTML = "w:";
-  labelz.style.textAlign = "center";
+      // Create the label for the slider
+      let labelz = document.createElement("label");
+      labelz.setAttribute("for", "k-slider");
+      labelz.innerHTML = "k:";
+      labelz.style.textAlign = "center";
 
-  // Create the span element to display the slider value
-  let valueSpanz = document.createElement("span");
-  valueSpanz.setAttribute("id", "w-value");
-  valueSpanz.innerHTML = 500;
-  valueSpanz.style.marginBottom = "0.2em";
+      // Create the span element to display the slider value
+      let valueSpanz = document.createElement("span");
+      valueSpanz.setAttribute("id", "k-value");
+      valueSpanz.innerHTML = 50;
+      valueSpanz.style.marginBottom = "0.2em";
 
-  // Append the slider and labels to the container
-  container.appendChild(labelz);
-  container.appendChild(slider);
-  container.appendChild(valueSpanz);
+      // Append the slider and labels to the container
+      container.appendChild(labelz);
+      container.appendChild(slider);
+      container.appendChild(valueSpanz);
 
-  // Create the slider element
-  let slider2 = document.createElement("input");
-  slider2.setAttribute("type", "range");
-  slider2.setAttribute("min", 1);
-  slider2.setAttribute("max", 10000);
-  slider2.setAttribute("step", "1");
-  slider2.setAttribute("value", 500);
-  slider2.setAttribute("id", "h-slider");
+      extraParametersDiv.appendChild(container);
+      // Make the extra-parameters div visible
+      extraParametersDiv.style.visibility = "visible";
 
-  // Create the label for the slider
-  let labelh = document.createElement("label");
-  labelh.setAttribute("for", "h-slider");
-  labelh.innerHTML = "h:";
-  labelh.style.textAlign = "center";
+      slider.addEventListener("input", function () {
+        document.querySelector(`#k-value`).innerHTML =
+          this.value;
+      });
+    } else if (
+      ["Nearest_Neighbour", "Bilinear", "BicubicInterpolation"].includes(
+        filterSelect.value
+      )
+    ) {
+      // Create a container for the slider and labels
+      let container = document.createElement("div");
+      container.style.display = "flex";
+      container.style.flexDirection = "column";
+      container.style.width = "100%";
 
-  // Create the span element to display the slider value
-  let valueSpan = document.createElement("span");
-  valueSpan.setAttribute("id", "h-value");
-  valueSpan.innerHTML = 500;
-  valueSpan.style.marginBottom = "0.2em";
+      // Create the slider element
+      let slider = document.createElement("input");
+      slider.setAttribute("type", "range");
+      slider.setAttribute("min", 1);
+      slider.setAttribute("max", 10000);
+      slider.setAttribute("step", "1");
+      slider.setAttribute("value", 500);
+      slider.setAttribute("id", "w-slider");
 
-  // Append the slider and labels to the container
-  container.appendChild(labelh);
-  container.appendChild(slider2);
-  container.appendChild(valueSpan);
+      // Create the label for the slider
+      let labelz = document.createElement("label");
+      labelz.setAttribute("for", "w-slider");
+      labelz.innerHTML = "w:";
+      labelz.style.textAlign = "center";
 
-  // Insert the container into the extra-parameters div
-  extraParametersDiv.appendChild(container);
+      // Create the span element to display the slider value
+      let valueSpanz = document.createElement("span");
+      valueSpanz.setAttribute("id", "w-value");
+      valueSpanz.innerHTML = 500;
+      valueSpanz.style.marginBottom = "0.2em";
 
-  // Make the extra-parameters div visible
-  extraParametersDiv.style.visibility = "visible";
+      // Append the slider and labels to the container
+      container.appendChild(labelz);
+      container.appendChild(slider);
+      container.appendChild(valueSpanz);
 
-  let wSlider = document.querySelector("#w-slider");
-  let hSlider = document.querySelector("#h-slider");
+      // Create the slider element
+      let slider2 = document.createElement("input");
+      slider2.setAttribute("type", "range");
+      slider2.setAttribute("min", 1);
+      slider2.setAttribute("max", 10000);
+      slider2.setAttribute("step", "1");
+      slider2.setAttribute("value", 500);
+      slider2.setAttribute("id", "h-slider");
 
-  // Add event listener to the width slider
-  wSlider.addEventListener("input", function () {
-    // When the slider is changed, update the innerHTML of the #w-value element
-    document.querySelector("#w-value").innerHTML = this.value;
-  });
+      // Create the label for the slider
+      let labelh = document.createElement("label");
+      labelh.setAttribute("for", "h-slider");
+      labelh.innerHTML = "h:";
+      labelh.style.textAlign = "center";
 
-  // Add event listener to the height slider
-  hSlider.addEventListener("input", function () {
-    // When the slider is changed, update the innerHTML of the #h-value element
-    document.querySelector("#h-value").innerHTML = this.value;
-  });
-} else if (filterSelect.value === "apply_gaussian_noise") {
-  let extraParametersDiv = document.querySelector(".extra-parameters"); // Assuming this is your div
+      // Create the span element to display the slider value
+      let valueSpan = document.createElement("span");
+      valueSpan.setAttribute("id", "h-value");
+      valueSpan.innerHTML = 500;
+      valueSpan.style.marginBottom = "0.2em";
 
-  ["mean", "std"].forEach((param) => {
-    let container = document.createElement("div");
-    container.style.display = "flex";
-    container.style.flexDirection = "column";
-    container.style.width = "100%";
+      // Append the slider and labels to the container
+      container.appendChild(labelh);
+      container.appendChild(slider2);
+      container.appendChild(valueSpan);
 
-    // Create the slider element
-    let slider = document.createElement("input");
-    slider.setAttribute("type", "range");
-    slider.setAttribute("min", param === "mean" ? "-50" : "1");
-    slider.setAttribute("max", param === "mean" ? "50" : "100");
-    slider.setAttribute("step", "0.01");
-    slider.setAttribute("value", param === "mean" ? "0" : "20");
-    slider.setAttribute("id", `${param}-slider`);
+      // Insert the container into the extra-parameters div
+      extraParametersDiv.appendChild(container);
 
-    // Create the label for the slider
-    let label = document.createElement("label");
-    label.setAttribute("for", `${param}-slider`);
-    label.innerHTML = `${param}:`;
-    label.style.textAlign = "center";
+      // Make the extra-parameters div visible
+      extraParametersDiv.style.visibility = "visible";
 
-    // Create the span element to display the slider value
-    let valueSpan = document.createElement("span");
-    valueSpan.setAttribute("id", `${param}-value`);
-    valueSpan.innerHTML = slider.getAttribute("value");
-    valueSpan.style.marginBottom = "0.2em";
+      let wSlider = document.querySelector("#w-slider");
+      let hSlider = document.querySelector("#h-slider");
 
-    // Append the slider and labels to the container
-    container.appendChild(label);
-    container.appendChild(slider);
-    container.appendChild(valueSpan);
+      // Add event listener to the width slider
+      wSlider.addEventListener("input", function () {
+        // When the slider is changed, update the innerHTML of the #w-value element
+        document.querySelector("#w-value").innerHTML = this.value;
+      });
 
-    // Insert the container into the extra-parameters div
-    extraParametersDiv.appendChild(container);
+      // Add event listener to the height slider
+      hSlider.addEventListener("input", function () {
+        // When the slider is changed, update the innerHTML of the #h-value element
+        document.querySelector("#h-value").innerHTML = this.value;
+      });
+    } else if (filterSelect.value === "apply_gaussian_noise") {
+      let extraParametersDiv = document.querySelector(".extra-parameters"); // Assuming this is your div
 
-    // Add event listener to the slider to update value display when the slider is changed
-    slider.addEventListener("input", function () {
-      document.querySelector(`#${param}-value`).innerHTML = this.value;
-    });
-  });
-}
-  });
+      ["mean", "std"].forEach((param) => {
+        let container = document.createElement("div");
+        container.style.display = "flex";
+        container.style.flexDirection = "column";
+        container.style.width = "100%";
+
+        // Create the slider element
+        let slider = document.createElement("input");
+        slider.setAttribute("type", "range");
+        slider.setAttribute("min", param === "mean" ? "-50" : "1");
+        slider.setAttribute("max", param === "mean" ? "50" : "100");
+        slider.setAttribute("step", "0.01");
+        slider.setAttribute("value", param === "mean" ? "0" : "20");
+        slider.setAttribute("id", `${param}-slider`);
+
+        // Create the label for the slider
+        let label = document.createElement("label");
+        label.setAttribute("for", `${param}-slider`);
+        label.innerHTML = `${param}:`;
+        label.style.textAlign = "center";
+
+        // Create the span element to display the slider value
+        let valueSpan = document.createElement("span");
+        valueSpan.setAttribute("id", `${param}-value`);
+        valueSpan.innerHTML = slider.getAttribute("value");
+        valueSpan.style.marginBottom = "0.2em";
+
+        // Append the slider and labels to the container
+        container.appendChild(label);
+        container.appendChild(slider);
+        container.appendChild(valueSpan);
+
+        // Insert the container into the extra-parameters div
+        extraParametersDiv.appendChild(container);
+
+        // Add event listener to the slider to update value display when the slider is changed
+        slider.addEventListener("input", function () {
+          document.querySelector(`#${param}-value`).innerHTML = this.value;
+        });
+      });
+    }
+});
 
 applyFilterButton.addEventListener("click", async function () {
   const filterType = filterSelect.value;
