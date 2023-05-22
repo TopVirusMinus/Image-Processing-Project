@@ -4,6 +4,7 @@ import math
 import numpy as np
 import random
 from flask import Flask, render_template, request
+from urllib.parse import unquote
 
 app = Flask(__name__)
 
@@ -386,7 +387,7 @@ def apply_uniform_noise(image, min_value, max_value):
     
     return new_img
 
-def fourier_transform(img):
+def fourier_transform(img, slider_param=20):
     height, width = img.shape
     dft = np.zeros((height, width), dtype=complex)
 
@@ -408,9 +409,26 @@ def fourier_transform(img):
         for v in range(width):
             dft_shift[u, v] = dft[u - height // 2, v - width // 2]
 
-    spectrum = 20*np.log(np.abs(dft_shift))
+    spectrum = slider_param*np.log(np.abs(dft_shift))
 
-    
+    # shape = dft_shift.shape
+        
+
+    # shift_amounts = [(size + 1) // 2 for size in shape]
+        
+    # ishifted_DFT = np.roll(dft_shift, shift_amounts, tuple(range(dft_shift.ndim)))
+    # M, N = ishifted_DFT.shape
+
+    # inverseImg = np.zeros_like(ishifted_DFT, dtype=complex)
+
+    # for x in range(M):
+    #     for y in range(N):
+    #         for u in range(M):
+    #             for v in range(N):
+    #                 inverseImg[x, y] += ishifted_DFT[u, v] * np.exp(2j * np.pi * (u*x/M + v*y/N))
+
+    # inverseImg /= M * N
+
     return spectrum
 
 def histogram_equalization(img):    
@@ -442,23 +460,93 @@ def histogram_equalization(img):
     
     return equalized_img
 
+def histogram_matching(img, target):
+    img_hist = np.zeros(256)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            img_hist[img[i, j]] += 1
+
+
+    matching_hist = np.zeros(256)
+    for i in range(target.shape[0]):
+        for j in range(target.shape[1]):
+            matching_hist[target[i, j]] += 1
+    
+    input_cdf = np.zeros(256)
+    input_cdf[0] = img_hist[0]
+    for i in range(1, 256):
+        input_cdf[i] = input_cdf[i-1] + img_hist[i]
+
+    nk = img.shape[0] * img.shape[1]
+    input_norm_cdf = input_cdf / nk
+    target_cdf = np.zeros(256, dtype=np.int32)
+    target_cdf[0] = matching_hist[0]
+    for i in range(1, 256):
+        target_cdf[i] = target_cdf[i-1] + matching_hist[i]
+
+    nk_target = target.shape[0] * target.shape[1]
+    test = target_cdf / nk_target
+
+    maping = np.zeros(256, dtype=np.uint8)
+    for i in range(256):
+        j = np.argmin(np.abs(input_norm_cdf[i] - test))
+        maping[i] = j
+
+    matched_img = np.zeros_like(img)
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            matched_img[i, j] = maping[img[i, j]]
+    
+    return matched_img
+
+
 @app.route('/process-image', methods=['POST'])
 def process_image():
     image_data = request.form.get('image_data')
+    matchedImage = request.form.get('extraImg')
     filter_type = request.form.get('filter_type')
     kernel_size = int(request.form.get('kernel_size'))
     extra_parameters = request.form.get('extraParams').split(',')
     
     print(filter_type)
     print(extra_parameters)
+    #print(image_data)
+    print("MATCHED IMAGE", matchedImage[:50])
     
     image_data = base64.b64decode(image_data.split(',')[1])
     nparr = np.frombuffer(image_data, np.uint8)
     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    
     height, width = gray_image.shape[:2]
     max_size = 512
+    
+    def add_padding(b64_string):
+        while len(b64_string) % 4 != 0:
+            b64_string += '='
+        return b64_string
+    
+    gray_matched_image = []
+    if filter_type == 'histogram_matching':
+        try:
+            matched_image_data = matchedImage.split(',')[1]
+            matched_image_data = "".join(matched_image_data.split())
+            matched_image_data += '=' * (-len(matched_image_data) % 4)
+
+            matchedImage_data = base64.b64decode(matched_image_data)
+            
+            nparr_matched = np.frombuffer(matchedImage_data, np.uint8)
+            
+            matchedImage = cv2.imdecode(nparr_matched, cv2.IMREAD_COLOR)
+            
+            if matchedImage is None:
+                print("The image was not correctly read.")
+            else:
+                gray_matched_image = cv2.cvtColor(matchedImage, cv2.COLOR_BGR2GRAY)
+        except Exception as e:
+            print("Error: ", e)
+
+    
 
     # Find the scaling factor
     scale = min(max_size/width, max_size/height)
@@ -469,7 +557,7 @@ def process_image():
 
     # Resize the image
     #gray_image = cv2.resize(gray_image, (new_width, new_height), interpolation=cv2.INTER_AREA)
-    
+
     print(gray_image.shape)
 
     filter_functions = {
@@ -487,6 +575,7 @@ def process_image():
         'apply_uniform_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'fourier_transform': lambda: fourier_transform(gray_image),
         'histogram_equalization': lambda: histogram_equalization(gray_image),
+        'histogram_matching': lambda: histogram_matching(gray_image, gray_matched_image),
     }
     
     processed_image = []

@@ -1,12 +1,16 @@
 const uploadInput = document.querySelector('input[name="image-upload"]');
+const uploadMatch = document.querySelector('input[name="match-image-upload"]');
 const uploadedImage = document.querySelector(".original-image");
 const filteredImage = document.querySelector(".filtered-image");
+const matchingImage = document.querySelector(".matching-image");
+
 const arrow = document.querySelector(".arrow");
 const applyFilterButton = document.querySelector(".dropbtn");
 const filterSelect = document.querySelector(".filter-select");
 const kernelSizeSlider = document.querySelector("#kernel-size");
 const kernelSizeValue = document.querySelector("#kernel-size-value");
 kernelSizeValue.style.textAlign = "left";
+var secondImageUpload = document.querySelector(".second-image-upload");
 
 function createSlider(id, min, max, value) {
   let slider = document.createElement("input");
@@ -93,12 +97,31 @@ uploadInput.addEventListener("change", function () {
   reader.readAsDataURL(file);
 });
 
+uploadMatch.addEventListener("change", function () {
+  const file = this.files[0];
+  const reader = new FileReader();
+  reader.addEventListener("load", function () {
+    matchingImage.src = reader.result;
+  });
+  reader.readAsDataURL(file);
+});
+
 document
   .querySelector(".filter-select")
   .addEventListener("change", function () {
     let extraParametersDiv = document.querySelector(".extra-parameters");
     // Clear existing content in extraParametersDiv
     extraParametersDiv.innerHTML = "";
+
+    filterSelect.addEventListener("change", function () {
+      if (filterSelect.value === "histogram_matching") {
+        secondImageUpload.style.display = "block";
+        matchingImage.style.display = "block";
+        matchingImage.src = "block";
+      } else {
+        secondImageUpload.style.display = "none";
+        matchingImage.style.display = "none";
+      }
 
     if (
       filterSelect.value === "UnsharpAvgFilter" ||
@@ -285,7 +308,9 @@ document
         });
       });
     }
+    
   });
+});
 
 applyFilterButton.addEventListener("click", async function () {
   const filterType = filterSelect.value;
@@ -319,10 +344,12 @@ applyFilterButton.addEventListener("click", async function () {
   let inputImageData = reuseFilteredImage
     ? filteredImage.src
     : uploadedImage.src;
-
+  
+  secondImageUpload = document.querySelector(".second-image-upload");
+  console.log(secondImageUpload.src);
   const body = `image_data=${encodeURIComponent(
     inputImageData
-  )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraParams=${extraValuesArray.join(
+  )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraImg=${secondImageUpload.src}&extraParams=${extraValuesArray.join(
     ","
   )}`;
 

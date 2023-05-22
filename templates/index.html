@@ -12,7 +12,7 @@
     <div class="upload-form">
       <h2 class="title">Upload an Image</h2>
       <form>
-        <input type="file" name="image-upload" accept="image/*" />
+        <input type="file" name="image-upload" accept="image/png" />
       </form>
       <div class="images">
         <img class="image original-image" alt="Uploaded image" hidden />
@@ -36,6 +36,7 @@
         <optgroup label="Ashraf">
           <option value="fourier_transform">Fourier Transform</option>
           <option value="histogram_equalization">Histogram Equalization</option>
+          <option value="histogram_matching">Histogram Matching</option>
         </optgroup>
         <optgroup label="Mustafa">
           <option value="apply_impulse_noise">Impulse Noise (salt and pepper)</option>
@@ -53,6 +54,10 @@
         <input type="range" id="kernel-size" min="1" max="50" value="3" step="2" />
         <span id="kernel-size-value">3</span>
         <form>
+              <form>
+                <input class="second-image-upload" type="file" name="match-image-upload" accept="image/png" style="display: none;" />
+              </form>
+              <img class="image matching-image" alt="Matching Image" hidden />
               <div class="c" style="display: flex;">
                 <input type="checkbox" id="reuse-filtered-image" name="reuse-filtered-image" style="margin-right: 10px;">
                 <label for="reuse-filtered-image">Reuse Image</label><br>
