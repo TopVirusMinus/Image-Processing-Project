@@ -1,16 +1,12 @@
 const uploadInput = document.querySelector('input[name="image-upload"]');
-const uploadMatch = document.querySelector('input[name="match-image-upload"]');
 const uploadedImage = document.querySelector(".original-image");
 const filteredImage = document.querySelector(".filtered-image");
-const matchingImage = document.querySelector(".matching-image");
-
 const arrow = document.querySelector(".arrow");
 const applyFilterButton = document.querySelector(".dropbtn");
 const filterSelect = document.querySelector(".filter-select");
 const kernelSizeSlider = document.querySelector("#kernel-size");
 const kernelSizeValue = document.querySelector("#kernel-size-value");
 kernelSizeValue.style.textAlign = "left";
-var secondImageUpload = document.querySelector(".second-image-upload");
 
 function createSlider(id, min, max, value) {
   let slider = document.createElement("input");
@@ -81,7 +77,6 @@ var kernelOptions = {
   ],
 };
 
-
 uploadInput.addEventListener("change", function () {
   const file = this.files[0];
   const reader = new FileReader();
@@ -97,31 +92,12 @@ uploadInput.addEventListener("change", function () {
   reader.readAsDataURL(file);
 });
 
-uploadMatch.addEventListener("change", function () {
-  const file = this.files[0];
-  const reader = new FileReader();
-  reader.addEventListener("load", function () {
-    matchingImage.src = reader.result;
-  });
-  reader.readAsDataURL(file);
-});
-
 document
   .querySelector(".filter-select")
   .addEventListener("change", function () {
     let extraParametersDiv = document.querySelector(".extra-parameters");
     // Clear existing content in extraParametersDiv
     extraParametersDiv.innerHTML = "";
-
-    filterSelect.addEventListener("change", function () {
-      if (filterSelect.value === "histogram_matching") {
-        secondImageUpload.style.display = "block";
-        matchingImage.style.display = "block";
-        matchingImage.src = "block";
-      } else {
-        secondImageUpload.style.display = "none";
-        matchingImage.style.display = "none";
-      }
 
     if (
       filterSelect.value === "UnsharpAvgFilter" ||
@@ -181,73 +157,70 @@ document
       slider.addEventListener("input", function () {
         document.querySelector("#k-value").innerHTML = this.value;
       });
-    }else if (filterSelect.value == "apply_uniform_noise") {
+    } else if (filterSelect.value == "apply_uniform_noise") {
       let extraParametersDiv = document.querySelector(".extra-parameters");
 
+      let min = 0;
+      let max = 255;
+      let valueMin = 0;
+      let valueMax = 255;
 
-        let min = 0;
-        let max = 255;
-        let valueMin = 0;
-        let valueMax = 255;
+      // Create a containers for the sliders and labels
+      let containerMin = document.createElement("div");
+      let containerMax = document.createElement("div");
 
-        // Create a containers for the sliders and labels
-        let containerMin = document.createElement("div");
-        let containerMax = document.createElement("div");
+      containerMin.style.display = "flex";
+      containerMin.style.flexDirection = "column";
+      containerMin.style.width = "100%";
 
-        containerMin.style.display = "flex";
-        containerMin.style.flexDirection = "column";
-        containerMin.style.width = "100%";
+      containerMax.style.display = "flex";
+      containerMax.style.flexDirection = "column";
+      containerMax.style.width = "100%";
 
-        containerMax.style.display = "flex";
-        containerMax.style.flexDirection = "column";
-        containerMax.style.width = "100%";
+      // Create the slider elements
+      let sliderMin = createSlider("min-slider", min, max, valueMin);
+      let sliderMax = createSlider("max-slider", min, max, valueMax);
 
-        // Create the slider elements
-        let sliderMin = createSlider("min-slider", min, max, valueMin);
-        let sliderMax = createSlider("max-slider", min, max, valueMax);
+      // Create the labels for the sliders
+      let labelMin = createLabel("min-slider", "Min:");
+      let labelMax = createLabel("max-slider", "Max:");
 
-        // Create the labels for the sliders
-        let labelMin = createLabel("min-slider", "Min:");
-        let labelMax = createLabel("max-slider", "Max:");
+      // Create the span elements to display the slider values
+      let valueSpanMin = createValueSpan("min-value", valueMin);
+      let valueSpanMax = createValueSpan("max-value", valueMax);
 
-        // Create the span elements to display the slider values
-        let valueSpanMin = createValueSpan("min-value", valueMin);
-        let valueSpanMax = createValueSpan("max-value", valueMax);
+      // Append the sliders and labels to the containers
+      appendChildren(containerMin, [labelMin, sliderMin, valueSpanMin]);
+      appendChildren(containerMax, [labelMax, sliderMax, valueSpanMax]);
 
-        // Append the sliders and labels to the containers
-        appendChildren(containerMin, [labelMin, sliderMin, valueSpanMin]);
-        appendChildren(containerMax, [labelMax, sliderMax, valueSpanMax]);
+      // Insert the containers into the extra-parameters div
+      appendChildren(extraParametersDiv, [containerMin, containerMax]);
 
-        // Insert the containers into the extra-parameters div
-        appendChildren(extraParametersDiv, [containerMin, containerMax]);
+      // Make the extra-parameters div visible
+      extraParametersDiv.style.visibility = "visible";
 
-        // Make the extra-parameters div visible
-        extraParametersDiv.style.visibility = "visible";
+      // Add event listeners to the sliders to update value display when the sliders are changed
+      sliderMin.addEventListener("input", function () {
+        document.querySelector("#min-value").innerHTML = this.value;
+      });
 
-        // Add event listeners to the sliders to update value display when the sliders are changed
-        sliderMin.addEventListener("input", function () {
-          document.querySelector("#min-value").innerHTML = this.value;
-        });
+      sliderMax.addEventListener("input", function () {
+        document.querySelector("#max-value").innerHTML = this.value;
+      });
+    } else if (filterSelect.value === "RobertCrossGradient") {
+      var kernelLabel = createLabel("kernelOption", "Choose Kernel");
+      extraParametersDiv.appendChild(kernelLabel);
 
-        sliderMax.addEventListener("input", function () {
-          document.querySelector("#max-value").innerHTML = this.value;
-        });
-      
+      // Create a div to contain the radio buttons
+      var radioContainer = document.createElement("div");
+      extraParametersDiv.appendChild(radioContainer);
 
-      } else if (filterSelect.value === "RobertCrossGradient") {
-          var kernelLabel = createLabel("kernelOption", "Choose Kernel");
-          extraParametersDiv.appendChild(kernelLabel);
+      // Create the first radio button [1,0] and its label
+      createRadioButton(radioContainer, "kernelOption", "0", "[[0,-1],[1,0]]");
 
-          // Create a div to contain the radio buttons
-          var radioContainer = document.createElement("div");
-          extraParametersDiv.appendChild(radioContainer);
-
-          // Create the first radio button [1,0] and its label
-          createRadioButton(radioContainer, "kernelOption", "0", "[[0,-1],[1,0]]");
-
-          // Create the second radio button [0,1] and its label
-          createRadioButton(radioContainer, "kernelOption", "1", "[[-1,0],[0,1]]");
-    }else if (filterSelect.value in kernelOptions) {
+      // Create the second radio button [0,1] and its label
+      createRadioButton(radioContainer, "kernelOption", "1", "[[-1,0],[0,1]]");
+    } else if (filterSelect.value in kernelOptions) {
       var kernelLabel = document.createElement("label");
       kernelLabel.innerHTML = "Choose Kernel";
       extraParametersDiv.appendChild(kernelLabel);
@@ -264,7 +237,90 @@ document
           option.label
         );
       });
-    } else if (filterSelect.value === "apply_gaussian_noise") {
+    } 
+else if (filterSelect.value === "Nearest_Neighbour") {
+  console.log("NEAREST NEIGH");
+
+  // Create a container for the slider and labels
+  let container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.flexDirection = "column";
+  container.style.width = "100%";
+
+  // Create the slider element
+  let slider = document.createElement("input");
+  slider.setAttribute("type", "range");
+  slider.setAttribute("min", 1);
+  slider.setAttribute("max", 10000);
+  slider.setAttribute("step", "1");
+  slider.setAttribute("value", 500);
+  slider.setAttribute("id", "w-slider");
+
+  // Create the label for the slider
+  let labelz = document.createElement("label");
+  labelz.setAttribute("for", "w-slider");
+  labelz.innerHTML = "w:";
+  labelz.style.textAlign = "center";
+
+  // Create the span element to display the slider value
+  let valueSpanz = document.createElement("span");
+  valueSpanz.setAttribute("id", "w-value");
+  valueSpanz.innerHTML = 500;
+  valueSpanz.style.marginBottom = "0.2em";
+
+  // Append the slider and labels to the container
+  container.appendChild(labelz);
+  container.appendChild(slider);
+  container.appendChild(valueSpanz);
+
+  // Create the slider element
+  let slider2 = document.createElement("input");
+  slider2.setAttribute("type", "range");
+  slider2.setAttribute("min", 1);
+  slider2.setAttribute("max", 10000);
+  slider2.setAttribute("step", "1");
+  slider2.setAttribute("value", 500);
+  slider2.setAttribute("id", "h-slider");
+
+  // Create the label for the slider
+  let labelh = document.createElement("label");
+  labelh.setAttribute("for", "h-slider");
+  labelh.innerHTML = "h:";
+  labelh.style.textAlign = "center";
+
+  // Create the span element to display the slider value
+  let valueSpan = document.createElement("span");
+  valueSpan.setAttribute("id", "h-value");
+  valueSpan.innerHTML = 500;
+  valueSpan.style.marginBottom = "0.2em";
+
+  // Append the slider and labels to the container
+  container.appendChild(labelh);
+  container.appendChild(slider2);
+  container.appendChild(valueSpan);
+
+  // Insert the container into the extra-parameters div
+  extraParametersDiv.appendChild(container);
+
+  // Make the extra-parameters div visible
+  extraParametersDiv.style.visibility = "visible";
+
+  let wSlider = document.querySelector("#w-slider");
+  let hSlider = document.querySelector("#h-slider");
+
+  // Add event listener to the width slider
+  wSlider.addEventListener("input", function () {
+    // When the slider is changed, update the innerHTML of the #w-value element
+    document.querySelector("#w-value").innerHTML = this.value;
+  });
+
+  // Add event listener to the height slider
+  hSlider.addEventListener("input", function () {
+    // When the slider is changed, update the innerHTML of the #h-value element
+    document.querySelector("#h-value").innerHTML = this.value;
+  });
+    }
+    else if (filterSelect.value === "apply_gaussian_noise") {
       let extraParametersDiv = document.querySelector(".extra-parameters"); // Assuming this is your div
 
       ["mean", "std"].forEach((param) => {
@@ -308,9 +364,7 @@ document
         });
       });
     }
-    
   });
-});
 
 applyFilterButton.addEventListener("click", async function () {
   const filterType = filterSelect.value;
@@ -344,12 +398,10 @@ applyFilterButton.addEventListener("click", async function () {
   let inputImageData = reuseFilteredImage
     ? filteredImage.src
     : uploadedImage.src;
-  
-  secondImageUpload = document.querySelector(".second-image-upload");
-  console.log(secondImageUpload.src);
+
   const body = `image_data=${encodeURIComponent(
     inputImageData
-  )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraImg=${secondImageUpload.src}&extraParams=${extraValuesArray.join(
+  )}&filter_type=${filterType}&kernel_size=${kernelSize}&extraParams=${extraValuesArray.join(
     ","
   )}`;
 
