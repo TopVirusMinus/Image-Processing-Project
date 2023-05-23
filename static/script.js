@@ -237,48 +237,8 @@ document
           option.label
         );
       });
-    } 
-    else if ("fourier_transform") {
-      let container = document.createElement("div");
-      container.style.display = "flex";
-      container.style.flexDirection = "column";
-      container.style.width = "100%";
-
-      // Create the slider element
-      let slider = document.createElement("input");
-      slider.setAttribute("type", "range");
-      slider.setAttribute("min", 1);
-      slider.setAttribute("max", 50);
-      slider.setAttribute("step", "1");
-      slider.setAttribute("value", 20);
-      slider.setAttribute("id", "k-slider");
-
-      // Create the label for the slider
-      let labelz = document.createElement("label");
-      labelz.setAttribute("for", "k-slider");
-      labelz.innerHTML = "k:";
-      labelz.style.textAlign = "center";
-
-      // Create the span element to display the slider value
-      let valueSpanz = document.createElement("span");
-      valueSpanz.setAttribute("id", "k-value");
-      valueSpanz.innerHTML = 50;
-      valueSpanz.style.marginBottom = "0.2em";
-
-      // Append the slider and labels to the container
-      container.appendChild(labelz);
-      container.appendChild(slider);
-      container.appendChild(valueSpanz);
-
-      extraParametersDiv.appendChild(container);
-      // Make the extra-parameters div visible
-      extraParametersDiv.style.visibility = "visible";
-
-      slider.addEventListener("input", function () {
-        document.querySelector(`#k-value`).innerHTML =
-          this.value;
-      });
-    } else if (
+    }
+    else if (
       ["Nearest_Neighbour", "Bilinear", "BicubicInterpolation"].includes(
         filterSelect.value
       )
@@ -405,7 +365,7 @@ document
         });
       });
     }
-});
+  });
 
 applyFilterButton.addEventListener("click", async function () {
   const filterType = filterSelect.value;
@@ -462,4 +422,4 @@ applyFilterButton.addEventListener("click", async function () {
 kernelSizeSlider.addEventListener("input", function () {
   const kernelSize = kernelSizeSlider.value;
   kernelSizeValue.textContent = kernelSize;
-});
+}); 
