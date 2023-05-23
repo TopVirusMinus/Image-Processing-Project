@@ -384,6 +384,38 @@ def apply_impulse_noise(image):
     return new_image
 
 
+def Gaussian_Smoothing(image, kernel_size, sigma=1.5):
+    k = [kernel_size, kernel_size]
+    r2 = 0
+    c2 = 0
+    img, start_row, end_row, start_col, end_col = pad_image(image, k)
+    Image_After = np.empty((img.shape[0], img.shape[1]))
+
+    while r2 <= img.shape[0]-k[0]:
+        pixel = 0
+        for r in range(r2, r2+k[0]):
+            for c in range(c2, c2+k[1]):
+                pixel += math.exp(-((r2+math.floor(k[0]/2)-r)**2+(
+                    c2+math.floor(k[1]/2)-c)**2)/(2*(sigma**2)))*img[r, c]
+                if np.isnan(Image_After[r, c]):
+                    Image_After[r, c] = img[r, c]
+
+        pixel *= 1/(2*math.pi*(sigma**2))
+        Image_After[r2+math.floor(k[0]/2), c2 +
+                    math.floor(k[1]/2)] = math.ceil(pixel)
+
+        if c2 == img.shape[1]-k[1]:
+            c2 = 0
+            r2 += 1
+        else:
+            c2 += 1
+
+    Image_After = unpad_image(Image_After, start_row,
+                              end_row, start_col, end_col)
+
+    return Image_After
+
+
 def apply_gaussian_noise(image, mean, stdev):
     gaussian_noise_image = image.copy()
 
@@ -447,12 +479,11 @@ def fourier_transform(img, k=20):
     spectrum = k*np.log(np.abs(dft_shift))
 
     # shape = dft_shift.shape
-        
 
     # shift_amounts = [(size + 1) // 2 for size in shape]
-        
+
     # ishifted_DFT = np.roll(dft_shift, shift_amounts, tuple(range(dft_shift.ndim)))
-        
+
     # ishifted_DFT
 
     # M, N = ishifted_DFT.shape
@@ -466,7 +497,7 @@ def fourier_transform(img, k=20):
     #                 inverseImg[x, y] += ishifted_DFT[u, v] * np.exp(2j * np.pi * (u*x/M + v*y/N))
 
     # inverseImg /= M * N
-    
+
     return spectrum
 
 
@@ -635,6 +666,7 @@ def process_image():
         'BicubicInterpolation': lambda: BicubicInterpolation(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'Bilinear': lambda: Bilinear(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'Nearest_Neighbour': lambda: Nearest_Neighbour(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+        'Gaussian_Smoothing': lambda: Gaussian_Smoothing(gray_image, kernel_size),
     }
 
     processed_image = []
