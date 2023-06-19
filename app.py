@@ -416,6 +416,22 @@ def Gaussian_Smoothing(image, kernel_size, sigma=1.5):
     return Image_After
 
 
+# def apply_gaussian_noise(image, mean, stddev):
+#     height, width = image.shape
+#     noisy_image = np.zeros((height, width))
+#     for i in range(height):
+#         for j in range(width):
+#             z = image[i, j]
+#             noise = (1 / (np.sqrt(2 * np.pi) * stddev)) * \
+#                 np.exp(-np.square(z - mean) / (2 * stddev**2))
+#             noisy_pixel = z + noise
+#             noisy_image[i, j] = noisy_pixel
+#             # ensure values are in 8-bit range
+#             noisy_image[i, j] = np.clip(noisy_image[i, j], 0, 255)
+
+#     return noisy_image
+
+
 def apply_gaussian_noise(image, mean, stdev):
     gaussian_noise_image = image.copy()
 
@@ -659,9 +675,9 @@ def process_image():
         'LaplaceOperator': lambda: LaplaceOperator(kernel_size, gray_image, int(extra_parameters[0])),
         'SobelOperator': lambda: SobelOperator(kernel_size, gray_image, int(extra_parameters[0])),
         'apply_impulse_noise': lambda: apply_impulse_noise(gray_image),
-        'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
+        'apply_gaussian_noise': lambda: apply_gaussian_noise(gray_image, float(extra_parameters[0]), float(extra_parameters[1])),
         'apply_uniform_noise': lambda: apply_uniform_noise(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
-        'fourier_transform': lambda: fourier_transform(gray_image, int(extra_parameters[0])),
+        'fourier_transform': lambda: fourier_transform(gray_image),
         'histogram_equalization': lambda: histogram_equalization(gray_image),
         'BicubicInterpolation': lambda: BicubicInterpolation(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
         'Bilinear': lambda: Bilinear(gray_image, int(extra_parameters[0]), int(extra_parameters[1])),
